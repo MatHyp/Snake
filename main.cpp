@@ -23,7 +23,6 @@ bool eventTriggered(double interval)
     }
     return false;
 }
-
 class Snake
 {
 public:
@@ -31,7 +30,7 @@ public:
 
     Vector2 direction = {1, 0};
 
-    void drawSnake()
+    void Draw()
     {
         for (unsigned int i = 0; i < body.size(); i++)
         {
@@ -73,14 +72,40 @@ public:
     }
 };
 
+class Game
+{
+public:
+    Snake snake = Snake();
+    Food food = Food();
+
+    void Draw()
+    {
+        food.Draw();
+        snake.Draw();
+    }
+
+    void Update()
+    {
+        snake.Update();
+        CheckCollisionWithFood();
+    }
+
+    void CheckCollisionWithFood()
+    {
+        if (Vector2Equals(snake.body[0], food.position))
+        {
+            food.position = food.generateRandomPos();
+        }
+    }
+};
+
 int main()
 {
 
     InitWindow(cellSize * cellCount, cellSize * cellCount, "Retro snake");
     SetTargetFPS(60);
 
-    Snake snake = Snake();
-    Food food = Food();
+    Game game = Game();
 
     while (WindowShouldClose() == false)
     {
@@ -88,31 +113,31 @@ int main()
 
         if (eventTriggered(0.2))
         {
-            snake.Update();
+            game.Update();
         }
-        if (IsKeyPressed(KEY_UP) && snake.direction.y != 1)
+        if (IsKeyPressed(KEY_UP) && game.snake.direction.y != 1)
         {
-            snake.direction = {0, -1};
-        }
-
-        if (IsKeyPressed(KEY_DOWN) && snake.direction.y != -1)
-        {
-            snake.direction = {0, 1};
-        }
-        if (IsKeyPressed(KEY_LEFT) && snake.direction.x != 1)
-        {
-            snake.direction = {-1, 0};
+            game.snake.direction = {0, -1};
         }
 
-        if (IsKeyPressed(KEY_RIGHT) && snake.direction.x != -1)
+        if (IsKeyPressed(KEY_DOWN) && game.snake.direction.y != -1)
         {
-            snake.direction = {1, 0};
+            game.snake.direction = {0, 1};
+        }
+        if (IsKeyPressed(KEY_LEFT) && game.snake.direction.x != 1)
+        {
+            game.snake.direction = {-1, 0};
+        }
+
+        if (IsKeyPressed(KEY_RIGHT) && game.snake.direction.x != -1)
+        {
+            game.snake.direction = {1, 0};
         }
 
         // Drawing
         ClearBackground(green);
-        snake.drawSnake();
-        food.Draw();
+
+        game.Draw();
 
         EndDrawing();
     }
